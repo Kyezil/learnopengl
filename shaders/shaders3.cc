@@ -8,17 +8,18 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 
 const GLchar *vertexShaderSource = "#version 330 core\n"
   "layout (location = 0) in vec3 position;"
-  "out vec4 vertexColor;"
+  "layout (location = 1) in vec3 color;"
+  "out vec3 ourColor;"
   "void main() {"
   "gl_Position = vec4(position, 1.0);"
-  "vertexColor = vec4(.5f, .0f, .0f, 1.0f);"
+  "ourColor = color;"
   "}";
 
 const GLchar *fragmentShaderSource = "#version 330 core\n"
   "out vec4 color;"
-  "uniform vec4 ourColor;"
+  "in vec3 ourColor;"
   "void main() {"
-  "color = ourColor;"
+  "color = vec4(ourColor, 1.0f);"
   "}";
 
 int main() {
@@ -92,10 +93,10 @@ int main() {
   glDeleteShader(vertexShader);
   glDeleteShader(fragmentShader);
 
-  GLfloat vertices1[] = {
-    -.5f, -.5f, .0f,
-    .0f, .5f, .0f,
-    .5f, -.5f, .0f
+  GLfloat vertices1[] = { // {position, color} x 3
+    -.5f, -.5f, .0f,  1.0f,  0.0f,  0.0f,
+     .0f,  .5f, .0f,  0.0f,  1.0f,  0.0f,
+     .5f, -.5f, .0f,  0.0f,  0.0f,  1.0f
   };
   // generate VAO, VBO
   GLuint VAO, VBO;
@@ -108,8 +109,12 @@ int main() {
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices1), vertices1, GL_STATIC_DRAW);
   // Step 3: set vertex attribute pointers
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), (GLvoid *)0 );
+  // position
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6*sizeof(GLfloat), (GLvoid *)0 );
   glEnableVertexAttribArray(0);
+  // color
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6*sizeof(GLfloat), (GLvoid *)(3*sizeof(GLfloat)));
+  glEnableVertexAttribArray(1);
   // Step 4: unbind vertex array object
   glBindVertexArray(0);
 
